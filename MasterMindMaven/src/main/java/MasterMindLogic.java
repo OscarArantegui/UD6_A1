@@ -16,6 +16,13 @@ public class MasterMindLogic {
         this.LABELS = labels;
     }
 
+    public MasterMindLogic() {
+        //Damos valores default para que no de error el constructor
+        this.PALETTE = new Color[]{Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW};
+        this.SECRET = generateSecret(4);
+        this.LABELS = new String[]{"R", "G", "B", "Y"};
+    }
+
     // Secret generator
     public Color[] generateSecret(int secretLength) {
         Random random = new Random();

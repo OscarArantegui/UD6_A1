@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Main.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">mastermind-game</a> &gt; <a href="index.source.html" class="el_package">default</a> &gt; <span class="el_source">Main.java</span></div><h1>Main.java</h1><pre class="source lang-java linenums">import javax.swing.*;
+import java.awt.Color;
+
+<span class="nc" id="L4">public class Main {</span>
+    public static void main(String[] args) {
+
+<span class="nc" id="L7">        Color[] palette = {</span>
+                new Color(240, 17, 17),
+                new Color(104, 227, 70),
+                new Color(45, 64, 189),
+                new Color(191, 83, 40),
+                new Color(242, 135, 34),
+                new Color(204, 94, 235)
+        };
+
+<span class="nc" id="L16">        String[] labels = {&quot;R&quot;, &quot;V&quot;, &quot;A&quot;, &quot;M&quot;, &quot;N&quot;, &quot;L&quot;};</span>
+<span class="nc" id="L17">        int rounds = 10;</span>
+<span class="nc" id="L18">        int secretLength = 4;</span>
+
+        // Create logic
+<span class="nc" id="L21">        MasterMindLogic logic = new MasterMindLogic(palette, secretLength, labels);</span>
+
+        // Create UI
+<span class="nc" id="L24">        SwingUtilities.invokeLater(() -&gt; {</span>
+<span class="nc" id="L25">            new MasterMindUI(palette, labels, rounds, logic);</span>
+<span class="nc" id="L26">        });</span>
+<span class="nc" id="L27">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
