@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BacteriaLifeUI.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">mastermind-game</a> &gt; <a href="index.source.html" class="el_package">default</a> &gt; <span class="el_source">BacteriaLifeUI.java</span></div><h1>BacteriaLifeUI.java</h1><pre class="source lang-java linenums">import javax.swing.*;
+import java.awt.*;
+import java.util.Arrays;
+
+public class BacteriaLifeUI {
+    // Constants
+    private final BacteriaLifeLogic LOGIC;
+    private static final int BACTERIA_SIZE = 10;
+<span class="fc" id="L9">    private static final Color BG_COLOR = new Color(141, 69, 220);</span>
+    private static final int DIMENSION = 30;
+    private final JPanel genPanel;
+    // Components promoted for testing
+    private JFrame frame;
+    private JButton startButton;
+    private JLabel roundLabel;
+    private Timer timer; // Reference to timer to stop it if needed
+    // Current active gen
+    private int[][] bacteriaGen;
+
+    // Circle class for rounded objects (bacteria)
+    static class Circle extends JButton {
+        private Color color;
+        private final int diameter;
+
+<span class="fc" id="L25">        public Circle(Color color) {</span>
+<span class="fc" id="L26">            this.color = color;</span>
+<span class="fc" id="L27">            this.diameter = BACTERIA_SIZE;</span>
+<span class="fc" id="L28">            setContentAreaFilled(false);</span>
+<span class="fc" id="L29">            setBorderPainted(false);</span>
+<span class="fc" id="L30">            setFocusPainted(false);</span>
+<span class="fc" id="L31">            setOpaque(false);</span>
+<span class="fc" id="L32">            setEnabled(false);</span>
+<span class="fc" id="L33">        }</span>
+
+        @Override
+        protected void paintComponent(Graphics g) {
+<span class="fc" id="L37">            g.setColor(color);</span>
+<span class="fc" id="L38">            g.fillOval(0, 0, diameter, diameter); // use diameter instead of getWidth()/getHeight() if you want consistent circles</span>
+<span class="fc" id="L39">            super.paintComponent(g);</span>
+<span class="fc" id="L40">        }</span>
+
+        @Override
+        public Dimension getPreferredSize() {
+<span class="fc" id="L44">            return new Dimension(diameter, diameter);</span>
+        }
+
+        public void setCircleColor(Color c) {
+<span class="nc" id="L48">            this.color = c;</span>
+<span class="nc" id="L49">            repaint();</span>
+<span class="nc" id="L50">        }</span>
+
+        public Color getColor() {
+<span class="fc" id="L53">            return color;</span>
+        }
+    }
+
+    // Generate a generation
+    private JPanel generateGen() {
+<span class="fc" id="L59">        JPanel gen = new JPanel();</span>
+<span class="fc" id="L60">        gen.setLayout(new GridLayout(DIMENSION, DIMENSION, 3, 3));</span>
+<span class="fc" id="L61">        gen.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));</span>
+<span class="fc" id="L62">        gen.setBackground(BG_COLOR);</span>
+        // Row
+<span class="fc bfc" id="L64" title="All 2 branches covered.">        for (int i = 0; i &lt; DIMENSION; i++) {</span>
+            // Column
+<span class="fc bfc" id="L66" title="All 2 branches covered.">            for (int j = 0; j &lt; DIMENSION; j++) {</span>
+<span class="fc" id="L67">                Color color = Color.WHITE;</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">                if (bacteriaGen[i][j] == 1) {</span>
+<span class="fc" id="L69">                    color = Color.BLACK;</span>
+                }
+<span class="fc" id="L71">                Circle bacteria = new Circle(color);</span>
+<span class="fc" id="L72">                gen.add(bacteria);</span>
+            }
+        }
+<span class="fc" id="L75">        return gen;</span>
+    }
+
+    // Refresh the grid after generating a new round
+    private void refreshGenPanel() {
+<span class="fc" id="L80">        genPanel.removeAll();</span>
+<span class="fc" id="L81">        genPanel.setLayout(new GridLayout(DIMENSION, DIMENSION, 3, 3));</span>
+
+<span class="fc bfc" id="L83" title="All 2 branches covered.">        for (int i = 0; i &lt; DIMENSION; i++) {</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">            for (int j = 0; j &lt; DIMENSION; j++) {</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">                Color color = (bacteriaGen[i][j] == 1) ? Color.BLACK : Color.WHITE;</span>
+<span class="fc" id="L86">                genPanel.add(new Circle(color));</span>
+            }
+        }
+
+<span class="fc" id="L90">        genPanel.revalidate(); // To avoid bugs</span>
+<span class="fc" id="L91">        genPanel.repaint();</span>
+<span class="fc" id="L92">    }</span>
+
+    // A bottom panel with a round label and a start button
+    private JPanel bottomPanel() {
+<span class="fc" id="L96">        JPanel bottomPanel = new JPanel(new BorderLayout());</span>
+<span class="fc" id="L97">        bottomPanel.setBackground(BG_COLOR);</span>
+
+<span class="fc" id="L99">        this.roundLabel = new JLabel();</span>
+<span class="fc" id="L100">        roundLabel.setText(&quot;Round: &quot; + LOGIC.getRound());</span>
+
+<span class="fc" id="L102">        this.startButton = getStartButton(roundLabel);</span>
+
+<span class="fc" id="L104">        startButton.setPreferredSize(new Dimension(70, 50));</span>
+<span class="fc" id="L105">        startButton.setBackground(Color.WHITE);</span>
+<span class="fc" id="L106">        startButton.setContentAreaFilled(true);</span>
+<span class="fc" id="L107">        startButton.setBorderPainted(false);</span>
+<span class="fc" id="L108">        startButton.setFocusPainted(false);</span>
+
+<span class="fc" id="L110">        bottomPanel.add(roundLabel, BorderLayout.WEST);   // Left side</span>
+<span class="fc" id="L111">        bottomPanel.add(startButton, BorderLayout.EAST);  // Right side</span>
+
+<span class="fc" id="L113">        return bottomPanel;</span>
+    }
+    // Extracted logic for testing. This represents ONE tick of the timer.
+    void performEvolutionStep() {
+<span class="fc" id="L117">        int[][] oldGen = deepCopy(bacteriaGen);</span>
+<span class="fc" id="L118">        int[][] newGen = LOGIC.generateNewGen(oldGen);</span>
+
+<span class="pc bpc" id="L120" title="1 of 2 branches missed.">        if (BacteriaLifeLogic.checkStableGen(oldGen, newGen)) {</span>
+<span class="nc bnc" id="L121" title="All 2 branches missed.">            if (timer != null) timer.stop();</span>
+<span class="nc" id="L122">            return;</span>
+        }
+
+        // Move forward
+<span class="fc" id="L126">        bacteriaGen = newGen;</span>
+<span class="fc" id="L127">        refreshGenPanel();</span>
+<span class="fc" id="L128">        roundLabel.setText(&quot;Round: &quot; + LOGIC.getRound());</span>
+<span class="fc" id="L129">    }</span>
+    // Start button
+    private JButton getStartButton(JLabel roundLabel) {
+<span class="fc" id="L132">        JButton startButton = new JButton(&quot;Start&quot;);</span>
+
+<span class="fc" id="L134">        startButton.addActionListener(e -&gt; {</span>
+            // If timer is already running, do nothing (or restart, depending on reqs)
+<span class="nc bnc" id="L136" title="All 4 branches missed.">            if (timer != null &amp;&amp; timer.isRunning()) return;</span>
+
+<span class="nc" id="L138">            this.timer = new Timer(100, ev -&gt; performEvolutionStep());</span>
+<span class="nc" id="L139">            timer.start();</span>
+<span class="nc" id="L140">        });</span>
+<span class="fc" id="L141">        return startButton;</span>
+    }
+
+    // To copy the gen
+    private int[][] deepCopy(int[][] bacteriaGen) {
+<span class="pc bpc" id="L146" title="1 of 2 branches missed.">        if (bacteriaGen == null) return null;</span>
+<span class="fc" id="L147">        int[][] copy = new int[bacteriaGen.length][];</span>
+<span class="fc bfc" id="L148" title="All 2 branches covered.">        for (int i = 0; i &lt; bacteriaGen.length; i++) {</span>
+<span class="fc" id="L149">            copy[i] = Arrays.copyOf(bacteriaGen[i], bacteriaGen[i].length);</span>
+        }
+<span class="fc" id="L151">        return copy;</span>
+    }
+
+    // Main
+<span class="fc" id="L155">    public BacteriaLifeUI(BacteriaLifeLogic logic) {</span>
+<span class="fc" id="L156">        this.LOGIC = logic;</span>
+<span class="fc" id="L157">        this.bacteriaGen = LOGIC.generateInitialGen();</span>
+
+        // Main frame
+<span class="fc" id="L160">        this.frame = new JFrame(&quot;BacteriaLife&quot;);</span>
+<span class="fc" id="L161">        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</span>
+<span class="fc" id="L162">        frame.setLayout(new BorderLayout());</span>
+
+        // Add the gen
+<span class="fc" id="L165">        this.genPanel = generateGen();</span>
+<span class="fc" id="L166">        frame.add(genPanel, BorderLayout.CENTER);</span>
+
+        // Add the bottom label
+<span class="fc" id="L169">        frame.add(bottomPanel(), BorderLayout.SOUTH);</span>
+
+<span class="fc" id="L171">        frame.pack();</span>
+<span class="fc" id="L172">        frame.setVisible(true);</span>
+<span class="fc" id="L173">    }</span>
+    // --- Getters for Testing ---
+<span class="fc" id="L175">    public JFrame getFrame() { return frame; }</span>
+<span class="fc" id="L176">    public JButton getStartButton() { return startButton; }</span>
+<span class="fc" id="L177">    public JLabel getRoundLabel() { return roundLabel; }</span>
+<span class="fc" id="L178">    public JPanel getGenPanel() { return genPanel; }</span>
+<span class="fc" id="L179">    public int[][] getBacteriaGen() { return bacteriaGen; }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

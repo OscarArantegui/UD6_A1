@@ -37,10 +37,12 @@ public class BacteriaLifeLogic {
             System.out.println("Can't get a stable gen.");
             return gen;
         }
-        int[][] newGen = new int[DIMENSION][DIMENSION];
+        int rows = gen.length;
+        int cols = gen[0].length;
+        int[][] newGen = new int[rows][cols];
         // Check each position
-        for (int i = 0; i < DIMENSION; i++) {
-            for (int j = 0; j < DIMENSION; j++) {
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
 
                 int bacteria = gen[i][j];
                 int neighbours = checkNeighbours(gen, i, j);

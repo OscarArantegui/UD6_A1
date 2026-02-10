@@ -9,12 +9,16 @@ public class BacteriaLifeUI {
     private static final Color BG_COLOR = new Color(141, 69, 220);
     private static final int DIMENSION = 30;
     private final JPanel genPanel;
-
+    // Components promoted for testing
+    private JFrame frame;
+    private JButton startButton;
+    private JLabel roundLabel;
+    private Timer timer; // Reference to timer to stop it if needed
     // Current active gen
     private int[][] bacteriaGen;
 
     // Circle class for rounded objects (bacteria)
-    private static class Circle extends JButton {
+    static class Circle extends JButton {
         private Color color;
         private final int diameter;
 
@@ -92,10 +96,10 @@ public class BacteriaLifeUI {
         JPanel bottomPanel = new JPanel(new BorderLayout());
         bottomPanel.setBackground(BG_COLOR);
 
-        JLabel roundLabel = new JLabel();
+        this.roundLabel = new JLabel();
         roundLabel.setText("Round: " + LOGIC.getRound());
 
-        JButton startButton = getStartButton(roundLabel);
+        this.startButton = getStartButton(roundLabel);
 
         startButton.setPreferredSize(new Dimension(70, 50));
         startButton.setBackground(Color.WHITE);
@@ -108,31 +112,30 @@ public class BacteriaLifeUI {
 
         return bottomPanel;
     }
+    // Extracted logic for testing. This represents ONE tick of the timer.
+    void performEvolutionStep() {
+        int[][] oldGen = deepCopy(bacteriaGen);
+        int[][] newGen = LOGIC.generateNewGen(oldGen);
 
+        if (BacteriaLifeLogic.checkStableGen(oldGen, newGen)) {
+            if (timer != null) timer.stop();
+            return;
+        }
+
+        // Move forward
+        bacteriaGen = newGen;
+        refreshGenPanel();
+        roundLabel.setText("Round: " + LOGIC.getRound());
+    }
     // Start button
     private JButton getStartButton(JLabel roundLabel) {
         JButton startButton = new JButton("Start");
 
         startButton.addActionListener(e -> {
+            // If timer is already running, do nothing (or restart, depending on reqs)
+            if (timer != null && timer.isRunning()) return;
 
-            final Timer timer = new Timer(100, null);
-
-            timer.addActionListener(ev -> {
-                int[][] oldGen = deepCopy(bacteriaGen);
-                int[][] newGen = LOGIC.generateNewGen(oldGen);
-
-
-                if (LOGIC.checkStableGen(oldGen, newGen)) {
-                    timer.stop();
-                    return;
-                }
-
-                // Move forward
-                bacteriaGen = newGen;
-                refreshGenPanel(); // update UI with newGen
-                roundLabel.setText("Round: " + LOGIC.getRound());
-            });
-
+            this.timer = new Timer(100, ev -> performEvolutionStep());
             timer.start();
         });
         return startButton;
@@ -154,18 +157,24 @@ public class BacteriaLifeUI {
         this.bacteriaGen = LOGIC.generateInitialGen();
 
         // Main frame
-        JFrame mainFrame = new JFrame("BacteriaLife");
-        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        mainFrame.setLayout(new BorderLayout());
+        this.frame = new JFrame("BacteriaLife");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLayout(new BorderLayout());
 
         // Add the gen
         this.genPanel = generateGen();
-        mainFrame.add(genPanel, BorderLayout.CENTER);
+        frame.add(genPanel, BorderLayout.CENTER);
 
         // Add the bottom label
-        mainFrame.add(bottomPanel(), BorderLayout.SOUTH);
+        frame.add(bottomPanel(), BorderLayout.SOUTH);
 
-        mainFrame.pack();
-        mainFrame.setVisible(true);
+        frame.pack();
+        frame.setVisible(true);
     }
+    // --- Getters for Testing ---
+    public JFrame getFrame() { return frame; }
+    public JButton getStartButton() { return startButton; }
+    public JLabel getRoundLabel() { return roundLabel; }
+    public JPanel getGenPanel() { return genPanel; }
+    public int[][] getBacteriaGen() { return bacteriaGen; }
 }
