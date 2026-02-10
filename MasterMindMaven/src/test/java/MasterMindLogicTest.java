@@ -51,6 +51,47 @@ public class MasterMindLogicTest {
         assertEquals(2, result.whites, "Debe haber 2 casillas blancas");
     }
     @Test
+    void testCheckGuess_AllCorrect() throws NoSuchFieldException, IllegalAccessException {
+        // 1. Preparamos el secreto fijo (RGBY)
+        Color[] fixedSecret = {Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW};
+
+        // 2. Inyectamos el secreto
+        Field secretField = MasterMindLogic.class.getDeclaredField("SECRET");
+        secretField.setAccessible(true);
+        // podemos usar directamente el objeto 'masterMindLogic' del setUp
+        secretField.set(masterMindLogic, fixedSecret);
+
+        // 3. El intento es IDÉNTICO al secreto
+        Color[] guess = {Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW};
+
+        // 4. Ejecutamos la lógica
+        MasterMindLogic.Result result = masterMindLogic.checkGuess(guess);
+
+        // 5. Comprobamos: Todo son aciertos exactos (negros)
+        assertEquals(4, result.blacks, "Debe haber 4 casillas negras (victoria)");
+        assertEquals(0, result.whites, "No debe haber casillas blancas porque todas son negras");
+    }
+    @Test
+    void testCheckGuess_AllWrong() throws NoSuchFieldException, IllegalAccessException {
+        // 1. Preparamos el secreto fijo (RGBY)
+        Color[] fixedSecret = {Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW};
+
+        // 2. Inyectamos el secreto
+        Field secretField = MasterMindLogic.class.getDeclaredField("SECRET");
+        secretField.setAccessible(true);
+        secretField.set(masterMindLogic, fixedSecret);
+
+        // 3. El intento usa colores que NO están en el secreto
+        Color[] guess = {Color.BLACK, Color.WHITE, Color.MAGENTA, Color.ORANGE};
+
+        // 4. Ejecutamos la lógica
+        MasterMindLogic.Result result = masterMindLogic.checkGuess(guess);
+
+        // 5. Comprobamos: Ningún acierto
+        assertEquals(0, result.blacks, "No debe haber casillas negras");
+        assertEquals(0, result.whites, "No debe haber casillas blancas");
+    }
+    @Test
     void testResultConstructor() {
         int blacks = 2;
         int whites = 2;

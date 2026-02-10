@@ -16,6 +16,10 @@ public class MasterMindUI {
     // Game logic
     private final MasterMindLogic LOGIC;
 
+    // Components promoted to fields for testing
+    private JFrame frame;
+    private JButton checkBtn;
+
     // Stores each row of guessed colors (4 circles per row)
     private ArrayList<Circle[]> guessRows = new ArrayList<>();
 
@@ -25,7 +29,7 @@ public class MasterMindUI {
     private int currentRow = 0;
 
     // Circle class for rounded objects
-    private static class Circle extends JButton {
+    static class Circle extends JButton {
         private Color color;
         private final int diameter;
 
@@ -174,7 +178,7 @@ public class MasterMindUI {
         controlPanel.setLayout(new GridLayout(1, 2, 10, 0));
         controlPanel.setPreferredSize(new Dimension(200, 50));
 
-        JButton checkBtn = createStyledButton("Check", BASE_COLOR, BUTTON_SIZE);
+        this.checkBtn = createStyledButton("Check", BASE_COLOR, BUTTON_SIZE);
         checkBtn.addActionListener(e -> {
             Circle[] currentGuess = guessRows.get(currentRow);
 
@@ -236,7 +240,7 @@ public class MasterMindUI {
         this.LOGIC = logic;
 
         // Main frame
-        JFrame frame = new JFrame("MasterMind");
+        this.frame = new JFrame("MasterMind");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
         // Frame with rounds
@@ -254,4 +258,18 @@ public class MasterMindUI {
         frame.pack();
         frame.setVisible(true);
     }
+    // ----- GETTERS Y SETTERS PARA TESTING -----
+    // Estos métodos evitan el uso de Reflexión en los tests
+
+    public JFrame getFrame() { return frame; }
+
+    public JButton getCheckButton() { return checkBtn; }
+
+    public ArrayList<Circle[]> getGuessRows() { return guessRows; }
+
+    public void setSelectedColor(Color c) { this.selectedColor = c; }
+
+    public Color getSelectedColor() { return selectedColor; }
+
+    public void setCurrentRow(int row) { this.currentRow = row; } // Útil para testear fin de juego
 }

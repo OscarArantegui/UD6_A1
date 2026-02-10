@@ -86,14 +86,16 @@
                     </argLine>
                 </configuration>
             </plugin>
-
             <!-- JaCoCo plugin for code coverage -->
-
-
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.11</version>
+                <configuration>
+                    <excludes>
+                        <exclude>Main.class</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
@@ -118,35 +120,16 @@
                             <rules>
                                 <rule>
                                     <element>BUNDLE</element>
-                                    <excludes>
-                                        <exclude>*Test</exclude>
-                                        <exclude>Main</exclude>
-                                    </excludes>
                                     <limits>
                                         <limit>
                                             <counter>INSTRUCTION</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.20</minimum>
+                                            <minimum>0.90</minimum>
                                         </limit>
                                         <limit>
                                             <counter>CLASS</counter>
                                             <value>MISSEDCOUNT</value>
-                                            <maximum>9</maximum>
-                                        </limit>
-                                    </limits>
-                                </rule>
-                                <rule>
-                                    <element>CLASS</element>
-                                    <excludes>
-                                        <exclude>*Test</exclude>
-                                        <exclude>Main</exclude>
-                                    </excludes>
-
-                                    <limits>
-                                        <limit>
-                                            <counter>LINE</counter>
-                                            <value>COVEREDRATIO</value>
-                                            <minimum>0.20</minimum>
+                                            <maximum>1</maximum>
                                         </limit>
                                     </limits>
                                 </rule>
@@ -154,9 +137,7 @@
                         </configuration>
                     </execution>
                 </executions>
-
             </plugin>
-
         </plugins>
     </build>
 </project>

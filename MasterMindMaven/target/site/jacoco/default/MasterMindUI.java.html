@@ -10,54 +10,58 @@ public class MasterMindUI {
     private static final int GUESS_SIZE = 35;
     private static final int BUTTON_SIZE = 50;
     // Colors
-<span class="nc" id="L13">    private static final Color BG_COLOR = new Color(141, 69, 220);</span>
-<span class="nc" id="L14">    private static final Color BASE_COLOR = new Color(187, 183, 172);</span>
-<span class="nc" id="L15">    private Color selectedColor = null;</span>
+<span class="fc" id="L13">    private static final Color BG_COLOR = new Color(141, 69, 220);</span>
+<span class="fc" id="L14">    private static final Color BASE_COLOR = new Color(187, 183, 172);</span>
+<span class="fc" id="L15">    private Color selectedColor = null;</span>
     // Game logic
     private final MasterMindLogic LOGIC;
 
+    // Components promoted to fields for testing
+    private JFrame frame;
+    private JButton checkBtn;
+
     // Stores each row of guessed colors (4 circles per row)
-<span class="nc" id="L20">    private ArrayList&lt;Circle[]&gt; guessRows = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L24">    private ArrayList&lt;Circle[]&gt; guessRows = new ArrayList&lt;&gt;();</span>
 
     // Stores each row of feedback pins (black/white pins for each guess)
-<span class="nc" id="L23">    private ArrayList&lt;Circle[]&gt; pinRows = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L27">    private ArrayList&lt;Circle[]&gt; pinRows = new ArrayList&lt;&gt;();</span>
 
-<span class="nc" id="L25">    private int currentRow = 0;</span>
+<span class="fc" id="L29">    private int currentRow = 0;</span>
 
     // Circle class for rounded objects
-    private static class Circle extends JButton {
+    static class Circle extends JButton {
         private Color color;
         private final int diameter;
 
-<span class="nc" id="L32">        public Circle(Color color, int diameter, boolean clickable) {</span>
-<span class="nc" id="L33">            this.color = color;</span>
-<span class="nc" id="L34">            this.diameter = diameter;</span>
-<span class="nc" id="L35">            setContentAreaFilled(false);</span>
-<span class="nc" id="L36">            setBorderPainted(false);</span>
-<span class="nc" id="L37">            setFocusPainted(false);</span>
-<span class="nc" id="L38">            setOpaque(false);</span>
-<span class="nc" id="L39">            setEnabled(clickable);</span>
-<span class="nc" id="L40">        }</span>
+<span class="fc" id="L36">        public Circle(Color color, int diameter, boolean clickable) {</span>
+<span class="fc" id="L37">            this.color = color;</span>
+<span class="fc" id="L38">            this.diameter = diameter;</span>
+<span class="fc" id="L39">            setContentAreaFilled(false);</span>
+<span class="fc" id="L40">            setBorderPainted(false);</span>
+<span class="fc" id="L41">            setFocusPainted(false);</span>
+<span class="fc" id="L42">            setOpaque(false);</span>
+<span class="fc" id="L43">            setEnabled(clickable);</span>
+<span class="fc" id="L44">        }</span>
 
         @Override
         protected void paintComponent(Graphics g) {
-<span class="nc" id="L44">            g.setColor(color);</span>
-<span class="nc" id="L45">            g.fillOval(0, 0, diameter, diameter); // use diameter instead of getWidth()/getHeight() if you want consistent circles</span>
-<span class="nc" id="L46">            super.paintComponent(g);</span>
-<span class="nc" id="L47">        }</span>
+<span class="fc" id="L48">            g.setColor(color);</span>
+<span class="fc" id="L49">            g.fillOval(0, 0, diameter, diameter); // use diameter instead of getWidth()/getHeight() if you want consistent circles</span>
+<span class="fc" id="L50">            super.paintComponent(g);</span>
+<span class="fc" id="L51">        }</span>
 
         @Override
         public Dimension getPreferredSize() {
-<span class="nc" id="L51">            return new Dimension(diameter, diameter);</span>
+<span class="fc" id="L55">            return new Dimension(diameter, diameter);</span>
         }
 
         public void setCircleColor(Color c) {
-<span class="nc" id="L55">            this.color = c;</span>
-<span class="nc" id="L56">            repaint();</span>
-<span class="nc" id="L57">        }</span>
+<span class="fc" id="L59">            this.color = c;</span>
+<span class="fc" id="L60">            repaint();</span>
+<span class="fc" id="L61">        }</span>
 
         public Color getColor() {
-<span class="nc" id="L60">            return color;</span>
+<span class="fc" id="L64">            return color;</span>
         }
     }
 
@@ -65,194 +69,208 @@ public class MasterMindUI {
     // ----- Helper functions -----
     // Create styled JButton
     private JButton createStyledButton(String text, Color bg, int size) {
-<span class="nc" id="L68">        JButton b = new JButton(text);</span>
-<span class="nc" id="L69">        b.setPreferredSize(new Dimension(size, size));</span>
-<span class="nc" id="L70">        b.setBackground(bg);</span>
-<span class="nc" id="L71">        b.setContentAreaFilled(true);</span>
-<span class="nc" id="L72">        b.setBorderPainted(false);</span>
-<span class="nc" id="L73">        b.setFocusPainted(false);</span>
-<span class="nc" id="L74">        return b;</span>
+<span class="fc" id="L72">        JButton b = new JButton(text);</span>
+<span class="fc" id="L73">        b.setPreferredSize(new Dimension(size, size));</span>
+<span class="fc" id="L74">        b.setBackground(bg);</span>
+<span class="fc" id="L75">        b.setContentAreaFilled(true);</span>
+<span class="fc" id="L76">        b.setBorderPainted(false);</span>
+<span class="fc" id="L77">        b.setFocusPainted(false);</span>
+<span class="fc" id="L78">        return b;</span>
     }
 
     // Pin panel for feedback
     private JPanel createPinPanel() {
-<span class="nc" id="L79">        JPanel pinPanel = new JPanel();</span>
-<span class="nc" id="L80">        Circle[] pinArray = new Circle[4];</span>
+<span class="fc" id="L83">        JPanel pinPanel = new JPanel();</span>
+<span class="fc" id="L84">        Circle[] pinArray = new Circle[4];</span>
 
-<span class="nc" id="L82">        pinPanel.setBackground(BG_COLOR);</span>
-<span class="nc" id="L83">        pinPanel.setLayout(new GridLayout(2, 2, 5, 5));</span>
+<span class="fc" id="L86">        pinPanel.setBackground(BG_COLOR);</span>
+<span class="fc" id="L87">        pinPanel.setLayout(new GridLayout(2, 2, 5, 5));</span>
 
-<span class="nc bnc" id="L85" title="All 2 branches missed.">        for (int j = 0; j &lt; 4; j++) {</span>
-<span class="nc" id="L86">            Circle pin = new Circle(BASE_COLOR, PIN_SIZE, false);</span>
-<span class="nc" id="L87">            pinArray[j] = pin;</span>
-<span class="nc" id="L88">            pinPanel.add(pin);</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">        for (int j = 0; j &lt; 4; j++) {</span>
+<span class="fc" id="L90">            Circle pin = new Circle(BASE_COLOR, PIN_SIZE, false);</span>
+<span class="fc" id="L91">            pinArray[j] = pin;</span>
+<span class="fc" id="L92">            pinPanel.add(pin);</span>
         }
 
-<span class="nc" id="L91">        pinRows.add(pinArray);</span>
+<span class="fc" id="L95">        pinRows.add(pinArray);</span>
 
-<span class="nc" id="L93">        return pinPanel;</span>
+<span class="fc" id="L97">        return pinPanel;</span>
     }
 
     // Guess slots panel
     private JPanel createGuessPanel() {
-<span class="nc" id="L98">        JPanel guessPanel = new JPanel();</span>
-<span class="nc" id="L99">        Circle[] guessArray = new Circle[4];</span>
-<span class="nc" id="L100">        guessPanel.setBackground(BG_COLOR);</span>
-<span class="nc" id="L101">        guessPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));</span>
+<span class="fc" id="L102">        JPanel guessPanel = new JPanel();</span>
+<span class="fc" id="L103">        Circle[] guessArray = new Circle[4];</span>
+<span class="fc" id="L104">        guessPanel.setBackground(BG_COLOR);</span>
+<span class="fc" id="L105">        guessPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));</span>
 
-<span class="nc bnc" id="L103" title="All 2 branches missed.">        for (int j = 0; j &lt; 4; j++) {</span>
-<span class="nc" id="L104">            Circle slot = new Circle(BASE_COLOR, GUESS_SIZE, true);</span>
-<span class="nc" id="L105">            guessArray[j] = slot;</span>
-<span class="nc" id="L106">            int rowIndex = guessRows.size();  // save the row index before adding</span>
-<span class="nc" id="L107">            slot.addActionListener(e -&gt; {</span>
+<span class="fc bfc" id="L107" title="All 2 branches covered.">        for (int j = 0; j &lt; 4; j++) {</span>
+<span class="fc" id="L108">            Circle slot = new Circle(BASE_COLOR, GUESS_SIZE, true);</span>
+<span class="fc" id="L109">            guessArray[j] = slot;</span>
+<span class="fc" id="L110">            int rowIndex = guessRows.size();  // save the row index before adding</span>
+<span class="fc" id="L111">            slot.addActionListener(e -&gt; {</span>
                 // Only allow coloring the CURRENT row
-<span class="nc bnc" id="L109" title="All 4 branches missed.">                if (rowIndex == currentRow &amp;&amp; selectedColor != null) {</span>
-<span class="nc" id="L110">                    slot.setCircleColor(selectedColor);</span>
+<span class="pc bpc" id="L113" title="2 of 4 branches missed.">                if (rowIndex == currentRow &amp;&amp; selectedColor != null) {</span>
+<span class="fc" id="L114">                    slot.setCircleColor(selectedColor);</span>
                 }
-<span class="nc" id="L112">            });</span>
+<span class="fc" id="L116">            });</span>
 
-<span class="nc" id="L114">            guessPanel.add(slot);</span>
+<span class="fc" id="L118">            guessPanel.add(slot);</span>
         }
-<span class="nc" id="L116">        guessRows.add(guessArray);</span>
-<span class="nc" id="L117">        return guessPanel;</span>
+<span class="fc" id="L120">        guessRows.add(guessArray);</span>
+<span class="fc" id="L121">        return guessPanel;</span>
     }
 
     // Round row,
     private JPanel createRoundRow() {
-<span class="nc" id="L122">        JPanel roundPanel = new JPanel();</span>
-<span class="nc" id="L123">        roundPanel.setBackground(BG_COLOR);</span>
-<span class="nc" id="L124">        roundPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 0));</span>
+<span class="fc" id="L126">        JPanel roundPanel = new JPanel();</span>
+<span class="fc" id="L127">        roundPanel.setBackground(BG_COLOR);</span>
+<span class="fc" id="L128">        roundPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 0));</span>
 
-<span class="nc" id="L126">        roundPanel.add(createPinPanel());</span>
-<span class="nc" id="L127">        roundPanel.add(createGuessPanel());</span>
+<span class="fc" id="L130">        roundPanel.add(createPinPanel());</span>
+<span class="fc" id="L131">        roundPanel.add(createGuessPanel());</span>
 
-<span class="nc" id="L129">        return roundPanel;</span>
+<span class="fc" id="L133">        return roundPanel;</span>
     }
 
     // Label showing selected color
     private JLabel createColorDisplayLabel(Color bg, int size) {
-<span class="nc" id="L134">        JLabel label = new JLabel(&quot;Selected&quot;, SwingConstants.CENTER);</span>
-<span class="nc" id="L135">        label.setOpaque(true);</span>
-<span class="nc" id="L136">        label.setBackground(bg);</span>
-<span class="nc" id="L137">        label.setPreferredSize(new Dimension(size, size));</span>
-<span class="nc" id="L138">        return label;</span>
+<span class="fc" id="L138">        JLabel label = new JLabel(&quot;Selected&quot;, SwingConstants.CENTER);</span>
+<span class="fc" id="L139">        label.setOpaque(true);</span>
+<span class="fc" id="L140">        label.setBackground(bg);</span>
+<span class="fc" id="L141">        label.setPreferredSize(new Dimension(size, size));</span>
+<span class="fc" id="L142">        return label;</span>
     }
 
     private void colorPins(Circle[] pins, MasterMindLogic.Result result) {
-<span class="nc" id="L142">        int blacks = result.blacks;</span>
-<span class="nc" id="L143">        int whites = result.whites;</span>
+<span class="fc" id="L146">        int blacks = result.blacks;</span>
+<span class="fc" id="L147">        int whites = result.whites;</span>
 
-<span class="nc bnc" id="L145" title="All 2 branches missed.">        if (blacks == 4) {</span>
-<span class="nc" id="L146">            JOptionPane.showMessageDialog(null, &quot;You guessed it!&quot;);</span>
-<span class="nc" id="L147">            return;</span>
+<span class="fc bfc" id="L149" title="All 2 branches covered.">        if (blacks == 4) {</span>
+<span class="fc" id="L150">            JOptionPane.showMessageDialog(null, &quot;You guessed it!&quot;);</span>
+<span class="fc" id="L151">            return;</span>
         } else {
-<span class="nc" id="L149">            JOptionPane.showMessageDialog(null, &quot;Black: &quot; + blacks + &quot;. White: &quot; + whites);</span>
+<span class="fc" id="L153">            JOptionPane.showMessageDialog(null, &quot;Black: &quot; + blacks + &quot;. White: &quot; + whites);</span>
         }
-<span class="nc bnc" id="L151" title="All 2 branches missed.">        if (currentRow == 9) {</span>
-<span class="nc" id="L152">            JOptionPane.showMessageDialog(null, &quot;You lost, the answer was: &quot; + LOGIC.showSecret());</span>
+<span class="fc bfc" id="L155" title="All 2 branches covered.">        if (currentRow == 9) {</span>
+<span class="fc" id="L156">            JOptionPane.showMessageDialog(null, &quot;You lost, the answer was: &quot; + LOGIC.showSecret());</span>
         }
-<span class="nc bnc" id="L154" title="All 2 branches missed.">        for (int i = 0; i &lt; 4; i++) {</span>
-<span class="nc bnc" id="L155" title="All 2 branches missed.">            if (blacks &gt; 0) {</span>
-<span class="nc" id="L156">                pins[i].setCircleColor(Color.BLACK);</span>
-<span class="nc" id="L157">                blacks--;</span>
-<span class="nc bnc" id="L158" title="All 2 branches missed.">            } else if (whites &gt; 0) {</span>
-<span class="nc" id="L159">                pins[i].setCircleColor(Color.WHITE);</span>
-<span class="nc" id="L160">                whites--;</span>
+<span class="fc bfc" id="L158" title="All 2 branches covered.">        for (int i = 0; i &lt; 4; i++) {</span>
+<span class="fc bfc" id="L159" title="All 2 branches covered.">            if (blacks &gt; 0) {</span>
+<span class="fc" id="L160">                pins[i].setCircleColor(Color.BLACK);</span>
+<span class="fc" id="L161">                blacks--;</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">            } else if (whites &gt; 0) {</span>
+<span class="fc" id="L163">                pins[i].setCircleColor(Color.WHITE);</span>
+<span class="fc" id="L164">                whites--;</span>
             }
         }
-<span class="nc" id="L163">    }</span>
+<span class="fc" id="L167">    }</span>
 
     // Bottom panel with colors &amp; button
     private JPanel createBottomPanel(Color[] colors, String[] labels) {
-<span class="nc" id="L167">        JPanel bottomPanel = new JPanel();</span>
-<span class="nc" id="L168">        bottomPanel.setBackground(BG_COLOR);</span>
-<span class="nc" id="L169">        bottomPanel.setLayout(new BorderLayout(10, 0));</span>
-<span class="nc" id="L170">        bottomPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));</span>
+<span class="fc" id="L171">        JPanel bottomPanel = new JPanel();</span>
+<span class="fc" id="L172">        bottomPanel.setBackground(BG_COLOR);</span>
+<span class="fc" id="L173">        bottomPanel.setLayout(new BorderLayout(10, 0));</span>
+<span class="fc" id="L174">        bottomPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));</span>
 
-<span class="nc" id="L172">        JPanel controlPanel = new JPanel();</span>
-<span class="nc" id="L173">        controlPanel.setBackground(BG_COLOR);</span>
-<span class="nc" id="L174">        controlPanel.setLayout(new GridLayout(1, 2, 10, 0));</span>
-<span class="nc" id="L175">        controlPanel.setPreferredSize(new Dimension(200, 50));</span>
+<span class="fc" id="L176">        JPanel controlPanel = new JPanel();</span>
+<span class="fc" id="L177">        controlPanel.setBackground(BG_COLOR);</span>
+<span class="fc" id="L178">        controlPanel.setLayout(new GridLayout(1, 2, 10, 0));</span>
+<span class="fc" id="L179">        controlPanel.setPreferredSize(new Dimension(200, 50));</span>
 
-<span class="nc" id="L177">        JButton checkBtn = createStyledButton(&quot;Check&quot;, BASE_COLOR, BUTTON_SIZE);</span>
-<span class="nc" id="L178">        checkBtn.addActionListener(e -&gt; {</span>
-<span class="nc" id="L179">            Circle[] currentGuess = guessRows.get(currentRow);</span>
+<span class="fc" id="L181">        this.checkBtn = createStyledButton(&quot;Check&quot;, BASE_COLOR, BUTTON_SIZE);</span>
+<span class="fc" id="L182">        checkBtn.addActionListener(e -&gt; {</span>
+<span class="fc" id="L183">            Circle[] currentGuess = guessRows.get(currentRow);</span>
 
             // Check if any slot is still BASE_COLOR
-<span class="nc" id="L182">            boolean allFilled = true;</span>
-<span class="nc bnc" id="L183" title="All 2 branches missed.">            for (Circle slot : currentGuess) {</span>
-<span class="nc bnc" id="L184" title="All 2 branches missed.">                if (slot.getColor().equals(BASE_COLOR)) {</span>
-<span class="nc" id="L185">                    allFilled = false;</span>
-<span class="nc" id="L186">                    break;</span>
+<span class="fc" id="L186">            boolean allFilled = true;</span>
+<span class="fc bfc" id="L187" title="All 2 branches covered.">            for (Circle slot : currentGuess) {</span>
+<span class="fc bfc" id="L188" title="All 2 branches covered.">                if (slot.getColor().equals(BASE_COLOR)) {</span>
+<span class="fc" id="L189">                    allFilled = false;</span>
+<span class="fc" id="L190">                    break;</span>
                 }
             }
 
-<span class="nc bnc" id="L190" title="All 2 branches missed.">            if (allFilled) {</span>
-<span class="nc" id="L191">                Circle[] current = guessRows.get(currentRow);</span>
-<span class="nc" id="L192">                Color[] colorsRound = new Color[current.length];</span>
+<span class="fc bfc" id="L194" title="All 2 branches covered.">            if (allFilled) {</span>
+<span class="fc" id="L195">                Circle[] current = guessRows.get(currentRow);</span>
+<span class="fc" id="L196">                Color[] colorsRound = new Color[current.length];</span>
 
-<span class="nc bnc" id="L194" title="All 2 branches missed.">                for (int i = 0; i &lt; current.length; i++) {</span>
-<span class="nc" id="L195">                    colorsRound[i] = current[i].color;</span>
+<span class="fc bfc" id="L198" title="All 2 branches covered.">                for (int i = 0; i &lt; current.length; i++) {</span>
+<span class="fc" id="L199">                    colorsRound[i] = current[i].color;</span>
                 }
 
-<span class="nc" id="L198">                colorPins(pinRows.get(currentRow), LOGIC.checkGuess(colorsRound));</span>
+<span class="fc" id="L202">                colorPins(pinRows.get(currentRow), LOGIC.checkGuess(colorsRound));</span>
                 // Move on to the next row
-<span class="nc" id="L200">                currentRow++;</span>
-<span class="nc" id="L201">            } else {</span>
+<span class="fc" id="L204">                currentRow++;</span>
+<span class="fc" id="L205">            } else {</span>
                 // Show warning that row is incomplete
-<span class="nc" id="L203">                JOptionPane.showMessageDialog(null, &quot;Please fill all slots before checking!&quot;);</span>
+<span class="fc" id="L207">                JOptionPane.showMessageDialog(null, &quot;Please fill all slots before checking!&quot;);</span>
             }
-<span class="nc" id="L205">        });</span>
+<span class="fc" id="L209">        });</span>
 
-<span class="nc" id="L207">        JLabel selected = createColorDisplayLabel(BASE_COLOR, BUTTON_SIZE);</span>
+<span class="fc" id="L211">        JLabel selected = createColorDisplayLabel(BASE_COLOR, BUTTON_SIZE);</span>
 
-<span class="nc" id="L209">        controlPanel.add(checkBtn);</span>
-<span class="nc" id="L210">        controlPanel.add(selected);</span>
+<span class="fc" id="L213">        controlPanel.add(checkBtn);</span>
+<span class="fc" id="L214">        controlPanel.add(selected);</span>
 
-<span class="nc" id="L212">        JPanel colorPanel = new JPanel();</span>
-<span class="nc" id="L213">        colorPanel.setBackground(BG_COLOR);</span>
-<span class="nc" id="L214">        colorPanel.setLayout(new GridLayout(1, colors.length, 0, 0));</span>
+<span class="fc" id="L216">        JPanel colorPanel = new JPanel();</span>
+<span class="fc" id="L217">        colorPanel.setBackground(BG_COLOR);</span>
+<span class="fc" id="L218">        colorPanel.setLayout(new GridLayout(1, colors.length, 0, 0));</span>
 
-<span class="nc bnc" id="L216" title="All 2 branches missed.">        for (int i = 0; i &lt; colors.length; i++) {</span>
-<span class="nc" id="L217">            JButton btn = createStyledButton(labels[i], colors[i], BUTTON_SIZE);</span>
-<span class="nc" id="L218">            final Color chosen = colors[i];</span>
+<span class="fc bfc" id="L220" title="All 2 branches covered.">        for (int i = 0; i &lt; colors.length; i++) {</span>
+<span class="fc" id="L221">            JButton btn = createStyledButton(labels[i], colors[i], BUTTON_SIZE);</span>
+<span class="fc" id="L222">            final Color chosen = colors[i];</span>
             // Change the color of selected label
-<span class="nc" id="L220">            btn.addActionListener(e -&gt; {</span>
-<span class="nc" id="L221">                selectedColor = chosen;</span>
-<span class="nc" id="L222">                selected.setBackground(selectedColor);</span>
-<span class="nc" id="L223">            });</span>
+<span class="fc" id="L224">            btn.addActionListener(e -&gt; {</span>
+<span class="nc" id="L225">                selectedColor = chosen;</span>
+<span class="nc" id="L226">                selected.setBackground(selectedColor);</span>
+<span class="nc" id="L227">            });</span>
 
-<span class="nc" id="L225">            colorPanel.add(btn);</span>
+<span class="fc" id="L229">            colorPanel.add(btn);</span>
         }
 
-<span class="nc" id="L228">        bottomPanel.add(colorPanel, BorderLayout.WEST);</span>
-<span class="nc" id="L229">        bottomPanel.add(controlPanel, BorderLayout.EAST);</span>
+<span class="fc" id="L232">        bottomPanel.add(colorPanel, BorderLayout.WEST);</span>
+<span class="fc" id="L233">        bottomPanel.add(controlPanel, BorderLayout.EAST);</span>
 
-<span class="nc" id="L231">        return bottomPanel;</span>
+<span class="fc" id="L235">        return bottomPanel;</span>
     }
 
     // Main UI
-<span class="nc" id="L235">    public MasterMindUI(Color[] colors, String[] labels, int rounds, MasterMindLogic logic) {</span>
-<span class="nc" id="L236">        this.LOGIC = logic;</span>
+<span class="fc" id="L239">    public MasterMindUI(Color[] colors, String[] labels, int rounds, MasterMindLogic logic) {</span>
+<span class="fc" id="L240">        this.LOGIC = logic;</span>
 
         // Main frame
-<span class="nc" id="L239">        JFrame frame = new JFrame(&quot;MasterMind&quot;);</span>
-<span class="nc" id="L240">        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</span>
-<span class="nc" id="L241">        frame.setLayout(new BorderLayout());</span>
+<span class="fc" id="L243">        this.frame = new JFrame(&quot;MasterMind&quot;);</span>
+<span class="fc" id="L244">        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</span>
+<span class="fc" id="L245">        frame.setLayout(new BorderLayout());</span>
         // Frame with rounds
-<span class="nc" id="L243">        JPanel centerPanel = new JPanel();</span>
-<span class="nc" id="L244">        centerPanel.setBackground(BG_COLOR);</span>
-<span class="nc" id="L245">        centerPanel.setLayout(new GridLayout(rounds, 1, 0, 0));</span>
+<span class="fc" id="L247">        JPanel centerPanel = new JPanel();</span>
+<span class="fc" id="L248">        centerPanel.setBackground(BG_COLOR);</span>
+<span class="fc" id="L249">        centerPanel.setLayout(new GridLayout(rounds, 1, 0, 0));</span>
         // Creating rounds
-<span class="nc bnc" id="L247" title="All 2 branches missed.">        for (int i = 0; i &lt; rounds; i++) {</span>
-<span class="nc" id="L248">            centerPanel.add(createRoundRow());</span>
+<span class="fc bfc" id="L251" title="All 2 branches covered.">        for (int i = 0; i &lt; rounds; i++) {</span>
+<span class="fc" id="L252">            centerPanel.add(createRoundRow());</span>
         }
-<span class="nc" id="L250">        frame.add(centerPanel, BorderLayout.CENTER);</span>
+<span class="fc" id="L254">        frame.add(centerPanel, BorderLayout.CENTER);</span>
         // Creating panel with buttons
-<span class="nc" id="L252">        frame.add(createBottomPanel(colors, labels), BorderLayout.SOUTH);</span>
+<span class="fc" id="L256">        frame.add(createBottomPanel(colors, labels), BorderLayout.SOUTH);</span>
 
-<span class="nc" id="L254">        frame.pack();</span>
-<span class="nc" id="L255">        frame.setVisible(true);</span>
-<span class="nc" id="L256">    }</span>
+<span class="fc" id="L258">        frame.pack();</span>
+<span class="fc" id="L259">        frame.setVisible(true);</span>
+<span class="fc" id="L260">    }</span>
+    // ----- GETTERS Y SETTERS PARA TESTING -----
+    // Estos métodos evitan el uso de Reflexión en los tests
+
+<span class="fc" id="L264">    public JFrame getFrame() { return frame; }</span>
+
+<span class="fc" id="L266">    public JButton getCheckButton() { return checkBtn; }</span>
+
+<span class="fc" id="L268">    public ArrayList&lt;Circle[]&gt; getGuessRows() { return guessRows; }</span>
+
+<span class="fc" id="L270">    public void setSelectedColor(Color c) { this.selectedColor = c; }</span>
+
+<span class="fc" id="L272">    public Color getSelectedColor() { return selectedColor; }</span>
+
+<span class="fc" id="L274">    public void setCurrentRow(int row) { this.currentRow = row; } // Útil para testear fin de juego</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
