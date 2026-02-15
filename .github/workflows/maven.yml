@@ -21,10 +21,14 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
+    # Instalamos Xvfb para simular una pantalla
+    - name: Instalar Xvfb
+      run: sudo apt-get update && sudo apt-get install -y xvfb
+
     - name: Construir y Testear (BacteriaLife)
-      # Ajusta la ruta si tu pom.xml está en otra carpeta
-      run: mvn -B verify --file BacteriaLifeMaven/pom.xml
+      # Usamos xvfb-run para que los tests de UI tengan una pantalla virtual
+      run: xvfb-run --auto-servernum mvn -B verify --file BacteriaLifeMaven/pom.xml
 
     - name: Construir y Testear (MasterMind)
-      # Ajusta la ruta si tu pom.xml está en otra carpeta
-      run: mvn -B verify --file MasterMindMaven/pom.xml
+      # Repetimos xvfb-run para el segundo proyecto
+      run: xvfb-run --auto-servernum mvn -B verify --file MasterMindMaven/pom.xml
